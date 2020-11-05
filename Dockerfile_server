@@ -1,0 +1,9 @@
+FROM ubuntu:18.04
+
+COPY server/src/entrypoint.sh /
+ 
+RUN chmod +x /entrypoint.sh
+
+EXPOSE 9000
+
+ENTRYPOINT ["/entrypoint.sh"]

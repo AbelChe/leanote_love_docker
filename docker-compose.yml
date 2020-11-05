@@ -1,0 +1,51 @@
+version: '3.0'
+services:
+  web-server:
+    container_name: leanote_web_server
+    build:
+      context: .
+      dockerfile: Dockerfile_server
+    volumes:
+      - ./leanote_src:/leanote
+    networks:
+      leanote-network:
+        ipv4_address: ${WEB_HOST}
+    environment:
+      INTRA_PORT: ${INTRA_PORT}
+      MONGO_HOST: ${MONGO_HOST}
+      MONGO_PORT: ${MONGO_PORT}
+      MONGO_USERNAME: ${MONGO_USERNAME}
+      MONGO_PASSWORD: ${MONGO_PASSWORD}
+    links:
+      - db
+    depends_on:
+      - db
+    ports:
+      - ${OPEN_PORT}:${INTRA_PORT}
+    restart: on-failure
+  db:
+    container_name: leanote_db
+    build:
+      context: .
+      dockerfile: Dockerfile_db
+    volumes:
+      - /home/data/leanote_data/db:/data/db
+    networks:
+      leanote-network:
+        ipv4_address: ${MONGO_HOST}
+    environment:
+      WEB_HOST: ${WEB_HOST}
+      MONGO_PORT: ${MONGO_PORT}
+      MONGO_HOST: ${MONGO_HOST}
+      #MONGO_INITDB_ROOT_USERNAME: ${MONGO_USERNAME}
+      #MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
+    #command:
+      #- mongorestore -h 127.0.0.1 -d leanote /leanote_db
+    expose:
+      - ${MONGO_PORT}
+    restart: always
+networks:
+  leanote-network:
+    ipam:
+      config:
+        - subnet: '192.168.100.0/24'

@@ -1,0 +1,7 @@
+FROM mongo
+
+COPY leanote_src/mongodb_backup/leanote_install_data /leanote_db
+
+RUN sed -i 's/bindIp: 127.0.0.1/bindIp: '${WEB_HOST}'/g' /etc/mongod.conf.orig
+
+EXPOSE 27017
